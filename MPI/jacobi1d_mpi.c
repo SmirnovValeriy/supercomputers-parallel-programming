@@ -46,10 +46,11 @@ int main(int argc, char** argv)
     int tsteps = atoi(argv[2]);
     double *A; 
     double *B;
-
+    
     MPI_Request req[4];
     int myrank, ranksize;
     int startelem, lastelem, nelem;
+    
     MPI_Status status[4];
     bench_timer_start();
     MPI_Init (&argc, &argv); /* initialize MPI system */
@@ -60,18 +61,19 @@ int main(int argc, char** argv)
     startelem = (myrank * n) / ranksize;
     lastelem = (((myrank + 1) * n) / ranksize)-1;
     nelem = lastelem - startelem + 1;
-
+    
    	/* initialize arrays */
     A = (double(*))malloc((nelem + 2) * sizeof(double));
     B = (double(*))malloc((nelem + 2) * sizeof(double));
     int i;
-    for (i = 1; i < nelem; i++) {
-        A[i] = ((double) i + startelem + 2) / n;
-        B[i] = ((double) i + startelem + 3) / n;
+    int correction = (myrank == 0) ? 1 : 0; 
+    for (i = 0; i < nelem + 2; i++) {
+        A[i] = ((double) i + startelem + 2 - correction) / n;
+        B[i] = ((double) i + startelem + 3 - correction) / n;
     }
     
     /******  iteration loop  *************************/
-    for(it = 1; it <= tsteps; it++)
+    for(it = 0; it < tsteps; it++)
     {   
         if(myrank != 0)
             MPI_Irecv(&A[0], 1, MPI_DOUBLE, myrank - 1, 1215, MPI_COMM_WORLD, &req[0]);
@@ -89,10 +91,6 @@ int main(int argc, char** argv)
             shift = 2;
         }
         if (myrank == ranksize - 1) 
-        {
-            ll = 2;
-        }
-        if(myrank == ranksize - 1)
         {
             ll = 2;
         }
@@ -124,17 +122,13 @@ int main(int argc, char** argv)
         {
             ll = 2;
         }
-        if(myrank == ranksize - 1)
-        {
-            ll = 2;
-        }
         MPI_Waitall(ll, &req[shift], &status[0]);
 
         for(i = 1; i <= nelem; i++) 
         {
-            if (((i == 1) && ( myrank == 0)) || ((i == nelem) && (myrank == ranksize - 1))) 
+            if (((i == 1) && (myrank == 0)) || ((i == nelem) && (myrank == ranksize - 1))) 
                 continue;
-            B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+            A[i] = 0.33333 * (B[i - 1] + B[i] + B[i + 1]);
         }
     }/* end of the iteration loop */
     MPI_Finalize(); 

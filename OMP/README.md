@@ -10,3 +10,11 @@ It gives some speedup, but obviously we need in some way modificate cycles to ge
 The final version were run on supercomputers. 
 
 Jupyter-notebook with graphics: **[graphics.ipynb](graphics.ipynb)**.
+
+### Run 
+
+To compile the program use **gcc**: \
+**`$ gcc jacobi1d_final.c -o final`**
+
+To run the program do: \
+**`$ ./final`**

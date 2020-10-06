@@ -14,4 +14,18 @@ Code: **[jacobi1d_mpi.c](jacobi1d_mpi.c)**.
 
 Jupyter-notebook with graphics: **[graphics.ipynb](graphics.ipynb)**.
 
-***NB:*** you need to have MPI installed.
+### Run 
+
+**Requirements:** \
+you need to have **MPI** installed.
+
+To install it do: \
+**`$ sudo apt update`** \
+**`$ sudo apt install mpich`**
+
+To compile the program use **mpicc**: \
+**`$ mpicc jacobi1d_mpi.c -o mpi`**
+
+To run the program use **mpirun**: \
+**`$ mpirun -np N_PROC ./mpi ARR_LENGTH T_STEPS`** \
+where: **N_PROC** - number of proccesses, **ARR_LENGTH** - length of arrays, **T_STEPS** - number of iterations.
