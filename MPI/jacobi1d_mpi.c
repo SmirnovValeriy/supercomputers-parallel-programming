@@ -2,17 +2,15 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
 
-double bench_t_start, bench_t_end;
-int i,j,it,k;
-int ll,shift;
 
-static
-double rtclock()
+double bench_t_start, bench_t_end;
+
+static double rtclock()
 {
     struct timeval Tp; 
 	/* structure including fields:
@@ -46,6 +44,8 @@ int main(int argc, char** argv)
     int tsteps = atoi(argv[2]);
     double *A; 
     double *B;
+    int i,it;
+    int ll,shift;
     
     MPI_Request req[4];
     int myrank, ranksize;
@@ -53,6 +53,7 @@ int main(int argc, char** argv)
     
     MPI_Status status[4];
     bench_timer_start();
+    
     MPI_Init (&argc, &argv); /* initialize MPI system */
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);/*my place in MPI system*/
     MPI_Comm_size (MPI_COMM_WORLD, &ranksize); /* size of MPI system */
@@ -65,7 +66,6 @@ int main(int argc, char** argv)
    	/* initialize arrays */
     A = (double(*))malloc((nelem + 2) * sizeof(double));
     B = (double(*))malloc((nelem + 2) * sizeof(double));
-    int i;
     int correction = (myrank == 0) ? 1 : 0; 
     for (i = 0; i < nelem + 2; i++) {
         A[i] = ((double) i + startelem + 2 - correction) / n;
@@ -131,10 +131,13 @@ int main(int argc, char** argv)
             A[i] = 0.33333 * (B[i - 1] + B[i] + B[i + 1]);
         }
     }/* end of the iteration loop */
+    
     MPI_Finalize(); 
+    
     bench_timer_stop();
     double sum = bench_t_end - bench_t_start;
+    
     if (myrank == ranksize - 1)
-        printf("%d,%d,%d,%f\n",ranksize, n, tsteps, sum); 
+        printf("%d,%d,%d,%f\n", ranksize, n, tsteps, sum); 
     return 0;
 }
