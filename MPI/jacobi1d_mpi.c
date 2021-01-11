@@ -13,11 +13,11 @@ double bench_t_start, bench_t_end;
 static double rtclock()
 {
     struct timeval Tp; 
-	/* structure including fields:
+	/* Structure including fields:
        long tv_sec - seconds since Jan. 1, 1970 
        long tv_usec - microseconds */
     int stat;
-    stat = gettimeofday (&Tp, NULL); /* get current time and data in seconds and mircroseconds (fill fields of struct Tp) */
+    stat = gettimeofday (&Tp, NULL); /* Get current time and data in seconds and mircroseconds (fill fields of struct Tp) */
     if (stat != 0) /* 0 - succcess, (-1) - failure */
         printf ("Error return from gettimeofday: %d", stat);
     return (Tp.tv_sec + Tp.tv_usec * 1.0e-6);
@@ -25,17 +25,17 @@ static double rtclock()
 
 void bench_timer_start()
 {
-    bench_t_start = rtclock (); /* remember time of start */
+    bench_t_start = rtclock (); /* Remember time of start */
 }
 
 void bench_timer_stop()
 {
-    bench_t_end = rtclock (); /* remember time of end */
+    bench_t_end = rtclock (); /* Remember time of end */
 }
 
 void bench_timer_print()
 {
-    printf ("Time in seconds = %0.6lf\n", bench_t_end - bench_t_start); /* print runtime */
+    printf ("Time in seconds = %0.6lf\n", bench_t_end - bench_t_start); /* Print time */
 }
 
 int main(int argc, char** argv)
@@ -54,16 +54,16 @@ int main(int argc, char** argv)
     MPI_Status status[4];
     bench_timer_start();
     
-    MPI_Init (&argc, &argv); /* initialize MPI system */
-    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);/*my place in MPI system*/
-    MPI_Comm_size (MPI_COMM_WORLD, &ranksize); /* size of MPI system */
+    MPI_Init (&argc, &argv); /* Initialize processes */
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);/* Rank of the process */
+    MPI_Comm_size (MPI_COMM_WORLD, &ranksize); /* Number of processes */
     MPI_Barrier(MPI_COMM_WORLD);
 
     startelem = (myrank * n) / ranksize;
     lastelem = (((myrank + 1) * n) / ranksize)-1;
     nelem = lastelem - startelem + 1;
     
-   	/* initialize arrays */
+   	/* Initialize arrays */
     A = (double(*))malloc((nelem + 2) * sizeof(double));
     B = (double(*))malloc((nelem + 2) * sizeof(double));
     int correction = (myrank == 0) ? 1 : 0; 
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         B[i] = ((double) i + startelem + 3 - correction) / n;
     }
     
-    /******  iteration loop  *************************/
+    /* Iteration loop */
     for(it = 0; it < tsteps; it++)
     {   
         if(myrank != 0)
@@ -130,14 +130,19 @@ int main(int argc, char** argv)
                 continue;
             A[i] = 0.33333 * (B[i - 1] + B[i] + B[i + 1]);
         }
-    }/* end of the iteration loop */
+    }
+    /* End of iteration loop */
     
-    MPI_Finalize(); 
+    free(A);
+    free(B);
     
     bench_timer_stop();
     double sum = bench_t_end - bench_t_start;
     
     if (myrank == ranksize - 1)
-        printf("%d,%d,%d,%f\n", ranksize, n, tsteps, sum); 
+        printf("%d,%d,%d,%f\n", ranksize, n, tsteps, sum);
+    
+    MPI_Finalize(); 
+
     return 0;
 }
