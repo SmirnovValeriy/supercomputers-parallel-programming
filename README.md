@@ -2,7 +2,7 @@
 
 ### Supercomputers and Parallel Data Processing course
 
-A Supercomputers and Parallel Data Processing course at the CMC Faculty of Lomonosov MSU is held for the 3rd grade students. 
+The Supercomputers and Parallel Data Processing course at the CMC Faculty of Lomonosov MSU is held for the 3rd grade students. 
 
 ### Tasks
 During the course students are offered to parallelize some algorithm using two technologies: OpenMP and MPI. Then they run their algorithms on MSU supercomputers: IBM Polus and IBM Bluegene. The result of the work is a report (with 3D-graphics) on the effectiveness of the proposed parallelization.
